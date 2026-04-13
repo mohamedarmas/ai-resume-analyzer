@@ -1,0 +1,20 @@
+{
+  "name": "ai_resume_analyzer",
+  "version": "1.0.0",
+  "description": "Local-first Flutter Web showcase for parsing resumes in the browser, scoring ATS readiness, matching job descriptions, generating structured rewrite suggestions, persisting local sessions, and exporting recruiter-friendly reports.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "capture:screenshots": "node scripts/capture_screenshots.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}
