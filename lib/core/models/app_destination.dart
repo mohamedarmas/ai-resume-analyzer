@@ -19,13 +19,13 @@ const appDestinations = <AppDestination>[
     label: 'Home',
     route: '/',
     icon: Icons.auto_awesome_mosaic_rounded,
-    subtitle: 'Narrative and launchpad',
+    subtitle: 'Start here and choose your path',
   ),
   AppDestination(
     label: 'Upload',
     route: '/upload',
     icon: Icons.upload_file_rounded,
-    subtitle: 'Browser-only intake pipeline',
+    subtitle: 'Use your own PDF or DOCX resume',
   ),
   AppDestination(
     label: 'Analysis',
@@ -55,7 +55,7 @@ const appDestinations = <AppDestination>[
     label: 'Demo',
     route: '/demo',
     icon: Icons.play_circle_outline_rounded,
-    subtitle: 'Sample flow for portfolio viewers',
+    subtitle: 'Guided walkthrough with sample data',
   ),
   AppDestination(
     label: 'Settings',

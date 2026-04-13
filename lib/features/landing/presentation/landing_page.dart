@@ -32,21 +32,17 @@ class LandingPage extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => context.go('/demo'),
             icon: const Icon(Icons.play_circle_outline_rounded),
-            label: const Text('Open live demo flow'),
-          ),
-          OutlinedButton.icon(
-            onPressed: () => context.go('/report'),
-            icon: const Icon(Icons.inventory_2_rounded),
-            label: const Text('View exportable report'),
+            label: const Text('Start guided demo'),
           ),
           OutlinedButton.icon(
             onPressed: () => context.go('/upload'),
             icon: const Icon(Icons.upload_file_rounded),
-            label: const Text('Try your own resume'),
+            label: const Text('Upload your resume'),
           ),
         ],
       ),
       children: <Widget>[
+        const _StartHereCard(),
         const _HeroProofStrip(),
         const _WorkflowShowcase(),
         const _BeforeAfterShowcase(),
@@ -124,6 +120,81 @@ class LandingPage extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _StartHereCard extends StatelessWidget {
+  const _StartHereCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Start here in under a minute',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'The app feels best when you follow the flow left to right. '
+              'If this is your first visit, use Demo. If you want real analysis, '
+              'go to Upload first. The Report page only becomes useful after a '
+              'resume has been loaded.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 24,
+              runSpacing: 24,
+              children: <Widget>[
+                SizedBox(
+                  width: 500,
+                  child: HighlightCard(
+                    title: 'Quick walkthrough',
+                    subtitle:
+                        'Best for first-time visitors, recruiters, or screenshots.',
+                    icon: Icons.play_circle_outline_rounded,
+                    bullets: const <String>[
+                      'Open Demo and click Seed demo into analysis.',
+                      'Review Analysis, then paste a target role in Job Match.',
+                      'Open AI Assist and finish on Report for exports.',
+                    ],
+                    child: FilledButton.icon(
+                      onPressed: () => context.go('/demo'),
+                      icon: const Icon(Icons.auto_awesome_rounded),
+                      label: const Text('Open demo'),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 500,
+                  child: HighlightCard(
+                    title: 'Use your own resume',
+                    subtitle:
+                        'Best when you want to test the real parser and scoring flow.',
+                    icon: Icons.upload_file_rounded,
+                    bullets: const <String>[
+                      'Open Upload and choose a PDF or DOCX file.',
+                      'Wait for the parsed snapshot, then open Analysis.',
+                      'Add a job description later if you want tailoring suggestions.',
+                    ],
+                    child: OutlinedButton.icon(
+                      onPressed: () => context.go('/upload'),
+                      icon: const Icon(Icons.arrow_forward_rounded),
+                      label: const Text('Go to upload'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

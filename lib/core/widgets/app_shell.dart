@@ -125,10 +125,10 @@ class _SidebarNavigation extends StatelessWidget {
           ),
           const Spacer(),
           _SidebarNote(
-            headline: 'Scaffold focus',
+            headline: 'Start here',
             body:
-                'Start by wiring upload, parser bridges, and ATS scoring. The '
-                'rest of the product can grow behind this shell.',
+                'Use Demo for a guided walkthrough or Upload for a real resume. '
+                'Then continue through Analysis, Job Match, AI Assist, and Report.',
           ),
         ],
       ),

@@ -1,6 +1,9 @@
 import 'package:ai_resume_analyzer/core/models/resume_document.dart';
 import 'package:ai_resume_analyzer/core/widgets/highlight_card.dart';
 import 'package:ai_resume_analyzer/core/widgets/page_layout.dart';
+import 'package:ai_resume_analyzer/core/widgets/workflow_journey_card.dart';
+import 'package:ai_resume_analyzer/features/job_match/domain/job_match_analyzer.dart';
+import 'package:ai_resume_analyzer/features/report/domain/report_export_builder.dart';
 import 'package:ai_resume_analyzer/features/upload/application/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +16,8 @@ class UploadPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(uploadControllerProvider);
     final controller = ref.read(uploadControllerProvider.notifier);
+    final hasJobDescription = ref.watch(jobDescriptionProvider).trim().isNotEmpty;
+    final hasExport = ref.watch(reportExportBundleProvider) != null;
 
     return AppPageLayout(
       eyebrow: 'Resume intake',
@@ -49,6 +54,12 @@ class UploadPage extends ConsumerWidget {
         ],
       ),
       children: <Widget>[
+        WorkflowJourneyCard(
+          currentRoute: '/upload',
+          hasResume: state.hasDocument,
+          hasJobDescription: hasJobDescription,
+          hasExport: hasExport,
+        ),
         _UploadWorkbench(
           state: state,
           onPickResume: state.isBusy ? null : controller.pickResume,

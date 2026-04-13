@@ -1,7 +1,10 @@
 import 'package:ai_resume_analyzer/core/widgets/highlight_card.dart';
 import 'package:ai_resume_analyzer/core/widgets/page_layout.dart';
+import 'package:ai_resume_analyzer/core/widgets/workflow_journey_card.dart';
 import 'package:ai_resume_analyzer/features/analysis/domain/resume_analysis_report.dart';
 import 'package:ai_resume_analyzer/features/analysis/domain/resume_analyzer.dart';
+import 'package:ai_resume_analyzer/features/job_match/domain/job_match_analyzer.dart';
+import 'package:ai_resume_analyzer/features/report/domain/report_export_builder.dart';
 import 'package:ai_resume_analyzer/features/upload/application/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,8 @@ class AnalysisPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(uploadControllerProvider);
     final report = ref.watch(analysisReportProvider);
+    final hasJobDescription = ref.watch(jobDescriptionProvider).trim().isNotEmpty;
+    final hasExport = ref.watch(reportExportBundleProvider) != null;
 
     return AppPageLayout(
       eyebrow: 'ATS scoring engine',
@@ -47,17 +52,42 @@ class AnalysisPage extends ConsumerWidget {
         ],
       ),
       children: <Widget>[
+        WorkflowJourneyCard(
+          currentRoute: '/analysis',
+          hasResume: state.hasDocument,
+          hasJobDescription: hasJobDescription,
+          hasExport: hasExport,
+        ),
         if (report != null)
           _AnalysisOverviewCard(report: report)
         else
-          const HighlightCard(
-            title: 'No parsed resume in session',
+          HighlightCard(
+            title: 'Load a resume before opening analysis',
+            subtitle:
+                'This screen only becomes useful after Upload or Demo seeds a '
+                'resume into the current browser session.',
             icon: Icons.hourglass_empty_rounded,
-            bullets: <String>[
+            bullets: const <String>[
               'Start from the upload route and parse a PDF or DOCX file.',
               'The analysis engine will consume the exact text extracted there.',
               'Demo mode can also seed a sample resume into this flow.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/upload'),
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Go to upload'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/demo'),
+                  icon: const Icon(Icons.play_circle_outline_rounded),
+                  label: const Text('Use demo'),
+                ),
+              ],
+            ),
           ),
         if (report != null) ...<Widget>[
           _CategoryScoreGrid(report: report),

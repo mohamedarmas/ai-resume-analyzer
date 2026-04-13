@@ -6,5 +6,6 @@ const appDescription =
     'on-device AI assistance.';
 
 const scaffoldStatus =
-    'Scaffold stage: navigation, architecture, and product surfaces are wired. '
-    'Parsing, scoring, and browser AI bridges are the next build slices.';
+    'Start with Demo for a guided walkthrough or Upload for a real resume. '
+    'Then move through Analysis, Job Match, AI Assist, and Report. The app '
+    'keeps the current session locally in your browser.';

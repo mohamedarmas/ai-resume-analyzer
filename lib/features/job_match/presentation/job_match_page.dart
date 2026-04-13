@@ -1,7 +1,9 @@
 import 'package:ai_resume_analyzer/core/widgets/highlight_card.dart';
 import 'package:ai_resume_analyzer/core/widgets/page_layout.dart';
+import 'package:ai_resume_analyzer/core/widgets/workflow_journey_card.dart';
 import 'package:ai_resume_analyzer/features/job_match/domain/job_match_analyzer.dart';
 import 'package:ai_resume_analyzer/features/job_match/domain/job_match_report.dart';
+import 'package:ai_resume_analyzer/features/report/domain/report_export_builder.dart';
 import 'package:ai_resume_analyzer/features/upload/application/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +35,8 @@ class _JobMatchPageState extends ConsumerState<JobMatchPage> {
   Widget build(BuildContext context) {
     final uploadState = ref.watch(uploadControllerProvider);
     final report = ref.watch(jobMatchReportProvider);
+    final hasJobDescription = ref.watch(jobDescriptionProvider).trim().isNotEmpty;
+    final hasExport = ref.watch(reportExportBundleProvider) != null;
 
     return AppPageLayout(
       eyebrow: 'Role targeting',
@@ -55,6 +59,12 @@ class _JobMatchPageState extends ConsumerState<JobMatchPage> {
         label: const Text('Hand off to AI assist'),
       ),
       children: <Widget>[
+        WorkflowJourneyCard(
+          currentRoute: '/job-match',
+          hasResume: uploadState.hasDocument,
+          hasJobDescription: hasJobDescription,
+          hasExport: hasExport,
+        ),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(28),
@@ -91,26 +101,65 @@ class _JobMatchPageState extends ConsumerState<JobMatchPage> {
           ),
         ),
         if (!uploadState.hasDocument)
-          const HighlightCard(
-            title: 'Resume required first',
+          HighlightCard(
+            title: 'Load a resume before matching a target role',
+            subtitle:
+                'Job Match compares the pasted job description against the '
+                'current resume session. Without that resume, this page has '
+                'nothing reliable to compare.',
             icon: Icons.hourglass_empty_rounded,
-            bullets: <String>[
+            bullets: const <String>[
               'The match engine compares the JD against the parsed resume in the current session.',
               'Use the upload route or demo mode to seed a resume first.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/upload'),
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Go to upload'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/demo'),
+                  icon: const Icon(Icons.play_circle_outline_rounded),
+                  label: const Text('Use demo'),
+                ),
+              ],
+            ),
           )
         else if (report != null) ...<Widget>[
           _JobMatchOverview(report: report),
           _KeywordPanels(report: report),
         ] else
-          const HighlightCard(
-            title: 'Paste a job description to start matching',
+          HighlightCard(
+            title: 'Paste a job description to unlock targeting guidance',
+            subtitle:
+                'This step is optional, but it makes the later rewrite and '
+                'report suggestions much more specific.',
             icon: Icons.content_paste_search_rounded,
-            bullets: <String>[
+            bullets: const <String>[
               'The app will extract role keywords and compare them against the current resume.',
               'Missing keywords do not mean you should invent experience.',
               'Use this as a tailoring guide, not as permission to fabricate claims.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/ai-assist'),
+                  icon: const Icon(Icons.psychology_alt_rounded),
+                  label: const Text('Skip to AI assist'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/analysis'),
+                  icon: const Icon(Icons.analytics_rounded),
+                  label: const Text('Back to analysis'),
+                ),
+              ],
+            ),
           ),
         const HighlightCard(
           title: 'Guardrails',

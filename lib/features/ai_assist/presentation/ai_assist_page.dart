@@ -1,8 +1,11 @@
 import 'package:ai_resume_analyzer/core/widgets/highlight_card.dart';
 import 'package:ai_resume_analyzer/core/widgets/page_layout.dart';
+import 'package:ai_resume_analyzer/core/widgets/workflow_journey_card.dart';
 import 'package:ai_resume_analyzer/features/ai_assist/domain/ai_assist_generator.dart';
 import 'package:ai_resume_analyzer/features/ai_assist/domain/ai_assist_plan.dart';
 import 'package:ai_resume_analyzer/features/ai_assist/domain/ai_capability.dart';
+import 'package:ai_resume_analyzer/features/job_match/domain/job_match_analyzer.dart';
+import 'package:ai_resume_analyzer/features/report/domain/report_export_builder.dart';
 import 'package:ai_resume_analyzer/features/upload/application/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +19,8 @@ class AiAssistPage extends ConsumerWidget {
     final uploadState = ref.watch(uploadControllerProvider);
     final capability = ref.watch(aiCapabilityProvider);
     final plan = ref.watch(aiAssistPlanProvider);
+    final hasJobDescription = ref.watch(jobDescriptionProvider).trim().isNotEmpty;
+    final hasExport = ref.watch(reportExportBundleProvider) != null;
 
     return AppPageLayout(
       eyebrow: 'Local AI rewrite layer',
@@ -36,15 +41,40 @@ class AiAssistPage extends ConsumerWidget {
         label: const Text('Preview final report'),
       ),
       children: <Widget>[
+        WorkflowJourneyCard(
+          currentRoute: '/ai-assist',
+          hasResume: uploadState.hasDocument,
+          hasJobDescription: hasJobDescription,
+          hasExport: hasExport,
+        ),
         _CapabilityCard(capability: capability),
         if (!uploadState.hasDocument)
-          const HighlightCard(
-            title: 'Resume required first',
+          HighlightCard(
+            title: 'Load a resume before opening AI Assist',
+            subtitle:
+                'This screen depends on the parsed resume and ATS output. It '
+                'cannot generate meaningful rewrite suggestions without them.',
             icon: Icons.hourglass_empty_rounded,
-            bullets: <String>[
+            bullets: const <String>[
               'Upload or load a resume before opening AI Assist.',
               'This screen depends on the parsed resume, ATS report, and optional job-match data.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/upload'),
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Go to upload'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/demo'),
+                  icon: const Icon(Icons.play_circle_outline_rounded),
+                  label: const Text('Use demo'),
+                ),
+              ],
+            ),
           )
         else if (plan != null) ...<Widget>[
           _SummaryRewriteCard(plan: plan),
@@ -52,13 +82,32 @@ class AiAssistPage extends ConsumerWidget {
           _TailoringCard(plan: plan),
           _PromptPreviewCard(plan: plan),
         ] else
-          const HighlightCard(
-            title: 'ATS data not ready yet',
+          HighlightCard(
+            title: 'Open analysis first, then come back here',
+            subtitle:
+                'AI Assist uses the ATS engine as its source of truth. Job Match '
+                'is optional, but it improves the tailoring suggestions.',
             icon: Icons.analytics_outlined,
-            bullets: <String>[
+            bullets: const <String>[
               'Run the parser and ATS analysis first.',
               'Job match is optional, but it improves tailoring suggestions.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/analysis'),
+                  icon: const Icon(Icons.analytics_rounded),
+                  label: const Text('Open analysis'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/job-match'),
+                  icon: const Icon(Icons.track_changes_rounded),
+                  label: const Text('Add job description'),
+                ),
+              ],
+            ),
           ),
       ],
     );

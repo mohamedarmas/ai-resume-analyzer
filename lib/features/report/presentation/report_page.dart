@@ -1,8 +1,11 @@
 import 'package:ai_resume_analyzer/core/widgets/highlight_card.dart';
 import 'package:ai_resume_analyzer/core/widgets/page_layout.dart';
+import 'package:ai_resume_analyzer/core/widgets/workflow_journey_card.dart';
+import 'package:ai_resume_analyzer/features/job_match/domain/job_match_analyzer.dart';
 import 'package:ai_resume_analyzer/features/report/domain/report_export_builder.dart';
 import 'package:ai_resume_analyzer/features/report/domain/report_export_bundle.dart';
 import 'package:ai_resume_analyzer/features/report/domain/report_export_service.dart';
+import 'package:ai_resume_analyzer/features/upload/application/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +16,8 @@ class ReportPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bundle = ref.watch(reportExportBundleProvider);
+    final hasResume = ref.watch(uploadControllerProvider).hasDocument;
+    final hasJobDescription = ref.watch(jobDescriptionProvider).trim().isNotEmpty;
 
     return AppPageLayout(
       eyebrow: 'Outputs',
@@ -46,14 +51,39 @@ class ReportPage extends ConsumerWidget {
         ],
       ),
       children: <Widget>[
+        WorkflowJourneyCard(
+          currentRoute: '/report',
+          hasResume: hasResume,
+          hasJobDescription: hasJobDescription,
+          hasExport: bundle != null,
+        ),
         if (bundle == null)
-          const HighlightCard(
-            title: 'No report available yet',
+          HighlightCard(
+            title: 'Load a resume before opening the report',
+            subtitle:
+                'The export bundle is generated from the current parsed resume '
+                'and ATS analysis. Without that session, this page has nothing to export.',
             icon: Icons.description_outlined,
-            bullets: <String>[
+            bullets: const <String>[
               'Parse a resume first so the ATS engine can create a report.',
               'The export actions appear once live analysis data exists.',
             ],
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: <Widget>[
+                FilledButton.icon(
+                  onPressed: () => context.go('/upload'),
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Go to upload'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/demo'),
+                  icon: const Icon(Icons.play_circle_outline_rounded),
+                  label: const Text('Use demo'),
+                ),
+              ],
+            ),
           )
         else ...<Widget>[
           _ExportActionsCard(bundle: bundle),

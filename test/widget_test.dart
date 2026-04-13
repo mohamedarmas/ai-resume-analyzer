@@ -15,7 +15,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('AI Resume Analyzer'), findsWidgets);
-    expect(find.text('Open live demo flow'), findsOneWidget);
+    expect(find.text('Start guided demo'), findsOneWidget);
     expect(find.text('End-to-end product flow'), findsOneWidget);
   });
 }
